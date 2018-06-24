@@ -28,7 +28,7 @@ class LevenshteinDistance
     const OP_INSERT_STR = 'ins';
     const OP_REPLACE_STR = 'rep';
 
-    // the detail level of the returned edit path
+    // the detail level of the returned edit progresses
     const PROGRESS_NONE = 0;
     const PROGRESS_SIMPLE = 1;
     const PROGRESS_FULL = 2;
@@ -61,11 +61,11 @@ class LevenshteinDistance
     }
 
     /**
-     * Calculate the edit path.
+     * Calculate the Levenshtein distance and edit progresses.
      *
      * @param string $oldStr       the old string
      * @param string $newStr       the new string
-     * @param int    $progressType the detail level of the returned edit path
+     * @param int    $progressType the detail level of the returned edit progresses
      *
      * @return array the distance and progresses
      */
@@ -79,11 +79,16 @@ class LevenshteinDistance
     }
 
     /**
-     * Calculate the edit path.
+     * Calculate the Levenshtein distance and edit progresses.
+     *
+     * $dist[x][y] means the Levenshtein distance betweewn $oldChars[0:x] and $newChars[0:y].
+     * That is, $dist[oldCharsCount][oldCharsCount] will be the final Levenshtein distance.
+     *
+     * $trace[x][y] is the corresponding backtracking information for $dist[x][y].
      *
      * @param string[] $oldChars     the array of old chars
      * @param string[] $newChars     the array of new chars
-     * @param int      $progressType the detail level of the returned edit path
+     * @param int      $progressType the detail level of the returned edit progresses
      *
      * @throws RuntimeException
      *
@@ -104,6 +109,8 @@ class LevenshteinDistance
         for ($x = 0; $x <= $m; ++$x) {
             $dist[$x] = $trace[$x] = [];
         }
+
+        // fill in boundary conditions
         for ($x = 0; $x <= $m; ++$x) {
             $dist[$x][0] = $x;
         }
@@ -111,9 +118,9 @@ class LevenshteinDistance
             $dist[0][$y] = $y;
         }
 
-        // calculate the edit distance/path
-        for ($y = 1; $y <= $n; ++$y) {
-            for ($x = 1; $x <= $m; ++$x) {
+        // calculate the edit distance and tracing information
+        for ($x = 1; $x <= $m; ++$x) {
+            for ($y = 1; $y <= $n; ++$y) {
                 if ($oldChars[$x - 1] === $newChars[$y - 1]) {
                     $dist[$x][$y] = $dist[$x - 1][$y - 1];
                     $trace[$x][$y] = [$x - 1, $y - 1, self::OP_COPY];
@@ -132,15 +139,15 @@ class LevenshteinDistance
             }
         }
 
+        // resolve edit progresses
         if ($progressType === self::PROGRESS_NONE) {
             $progresses = null;
         } else {
             $progresses = [];
 
-            // generate the edit path
             for (
                 $traceX = $m, $traceY = $n;
-                $traceX && $traceY;
+                $traceX !== 0 && $traceY !== 0;
                 [$traceX, $traceY] = $trace[$traceX][$traceY]
             ) {
                 // current trace type
@@ -155,7 +162,7 @@ class LevenshteinDistance
         return [
             // (int) Levenshtein distance
             'distance' => $dist[$m][$n],
-            // (null|array[]) edit progresses
+            // (null|array) edit progresses
             'progresses' => $progresses,
         ];
     }
