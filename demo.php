@@ -5,8 +5,11 @@ include __DIR__ . '/vendor/autoload.php';
 use Jfcherng\Utility\LevenshteinDistance;
 
 $results = LevenshteinDistance::calculate(
-    '自訂取代詞語模組', // old string
-    '自订取代词语模组！', // new string
+    // old string
+    '自訂取代詞語模組',
+    // new string
+    '自订取代词语模组！',
+    // progress type
     LevenshteinDistance::PROGRESS_FULL
 );
 
