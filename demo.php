@@ -4,7 +4,6 @@ include __DIR__ . '/vendor/autoload.php';
 
 use Jfcherng\Utility\LevenshteinDistance;
 
-// Unicode-ready!!
 $results = LevenshteinDistance::calculate(
     '自訂取代詞語模組', // old string
     '自订取代词语模组！', // new string
