@@ -2,29 +2,53 @@
 
 include __DIR__ . '/vendor/autoload.php';
 
-use Jfcherng\Utility\LevenshteinDistance;
+use Jfcherng\Utility\LevenshteinDistance as LD;
 
-$results = LevenshteinDistance::calculate(
-    // old string
-    '自訂取代詞語模組',
-    // new string
-    '自订取代词语模组！',
-    // progress type
-    LevenshteinDistance::PROGRESS_FULL
+$old = '自訂取代詞語模組';
+$new = '自订取代词语模组！';
+
+$results = LD::calculate(
+    $old, // old string
+    $new, // new string
+    true, // calculate edit progresses?
+    // progress options
+    LD::PROGRESS_OP_AS_STRING
 );
 
 // [
 //     'distance' => 5,
 //     'progresses' => [
-//         ['ins', 7],
-//         ['rep', 7, 7],
-//         ['cpy', 6, 6],
-//         ['rep', 5, 5],
-//         ['rep', 4, 4],
-//         ['cpy', 3, 3],
-//         ['cpy', 2, 2],
-//         ['rep', 1, 1],
-//         ['cpy', 0, 0],
+//         ['ins', 8, '！'],
+//         ['rep', 7, '组'],
+//         ['cpy', 6, '模'],
+//         ['rep', 5, '语'],
+//         ['rep', 4, '词'],
+//         ['cpy', 3, '代'],
+//         ['cpy', 2, '取'],
+//         ['rep', 1, '订'],
+//         ['cpy', 0, '自'],
+//     ],
+// ]
+var_dump($results);
+
+$results = LD::calculate(
+    $old, // old string
+    $new, // new string
+    true, // calculate edit progresses?
+    // progress options
+    LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_MERGE_NEIGHBOR
+);
+
+// [
+//     'distance' => 5,
+//     'progresses' => [
+//         ['ins', 8, '！', 1],
+//         ['rep', 7, '组', 1],
+//         ['cpy', 6, '模', 1],
+//         ['rep', 4, '词语', 2],
+//         ['cpy', 2, '取代', 2],
+//         ['rep', 1, '订', 1],
+//         ['cpy', 0, '自', 1],
 //     ],
 // ]
 var_dump($results);

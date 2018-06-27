@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Jfcherng\Utility\Test;
 
-use Jfcherng\Utility\LevenshteinDistance;
+use Jfcherng\Utility\LevenshteinDistance as LD;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,50 +21,78 @@ class LevenshteinDistanceTest extends TestCase
     {
         return [
             [
-                'This is a book.',
-                'There are some books.',
+                'this is a book',
+                'he has some books',
+                true,
+                LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_NO_COPY,
                 [
-                    'distance' => 11,
+                    'distance' => 9,
                     'progresses' => [
-                        ['cpy', 14, 20],
-                        ['ins', 13],
-                        ['cpy', 13, 18],
-                        ['cpy', 12, 17],
-                        ['cpy', 11, 16],
-                        ['cpy', 10, 15],
-                        ['cpy', 9, 14],
-                        ['ins', 8],
-                        ['ins', 8],
-                        ['ins', 8],
-                        ['rep', 8, 10],
-                        ['cpy', 7, 9],
-                        ['ins', 6],
-                        ['rep', 6, 7],
-                        ['rep', 5, 6],
-                        ['cpy', 4, 5],
-                        ['ins', 3],
-                        ['rep', 3, 3],
-                        ['rep', 2, 2],
-                        ['cpy', 1, 1],
-                        ['cpy', 0, 0],
+                        ['ins', 14, 's'],
+                        ['ins', 9, 'e'],
+                        ['rep', 8, 'm'],
+                        ['rep', 7, 'o'],
+                        ['del', 5, 'i'],
+                        ['rep', 2, 'a'],
+                        ['ins', 1, ' '],
+                        ['ins', 1, 'e'],
+                        ['rep', 0, 'h'],
+                    ],
+                ],
+            ],
+            [
+                'this is a book',
+                'he has some books',
+                true,
+                LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_NO_COPY | LD::PROGRESS_MERGE_NEIGHBOR,
+                [
+                    'distance' => 9,
+                    'progresses' => [
+                        ['ins', 14, 's', 1],
+                        ['ins', 9, 'e', 1],
+                        ['rep', 7, 'om', 2],
+                        ['del', 5, 'i', 1],
+                        ['rep', 2, 'a', 1],
+                        ['ins', 1, 'e ', 2],
+                        ['rep', 0, 'h', 1],
                     ],
                 ],
             ],
             [
                 '自訂取代詞語模組',
                 '自订取代词语模组！',
+                true,
+                LD::PROGRESS_OP_AS_STRING,
                 [
                     'distance' => 5,
                     'progresses' => [
-                        ['ins', 7],
-                        ['rep', 7, 7],
-                        ['cpy', 6, 6],
-                        ['rep', 5, 5],
-                        ['rep', 4, 4],
-                        ['cpy', 3, 3],
-                        ['cpy', 2, 2],
-                        ['rep', 1, 1],
-                        ['cpy', 0, 0],
+                        ['ins', 8, '！'],
+                        ['rep', 7, '组'],
+                        ['cpy', 6, '模'],
+                        ['rep', 5, '语'],
+                        ['rep', 4, '词'],
+                        ['cpy', 3, '代'],
+                        ['cpy', 2, '取'],
+                        ['rep', 1, '订'],
+                        ['cpy', 0, '自'],
+                    ],
+                ],
+            ],
+            [
+                '自訂取代詞語模組',
+                '自订取代词语模组！',
+                true,
+                LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_MERGE_NEIGHBOR,
+                [
+                    'distance' => 5,
+                    'progresses' => [
+                        ['ins', 8, '！', 1],
+                        ['rep', 7, '组', 1],
+                        ['cpy', 6, '模', 1],
+                        ['rep', 4, '词语', 2],
+                        ['cpy', 2, '取代', 2],
+                        ['rep', 1, '订', 1],
+                        ['cpy', 0, '自', 1],
                     ],
                 ],
             ],
@@ -72,20 +100,23 @@ class LevenshteinDistanceTest extends TestCase
     }
 
     /**
-     * Test the LevenshteinDistance::calculate with PROGRESS_FULL.
+     * Test the LevenshteinDistance::calculate.
      *
-     * @covers \Jfcherng\Utility\LevenshteinDistance::calculate
-     * @covers \Jfcherng\Utility\LevenshteinDistance::calculateWithArray
+     * @covers       \Jfcherng\Utility\LevenshteinDistance::calculate
+     * @covers       \Jfcherng\Utility\LevenshteinDistance::calculateWithArray
      * @dataProvider calculateDataProvider
      *
-     * @param string $old the old
-     * @param string $new the new
+     * @param string $old                 the old
+     * @param string $new                 the new
+     * @param bool   $calculateProgresses calculate the edit progresses
+     * @param int    $progressOptions     the progress options
+     * @param array  $expected            the expected
      */
-    public function testCalculate(string $old, string $new, array $expected): void
+    public function testCalculate(string $old, string $new, bool $calculateProgresses, int $progressOptions, array $expected): void
     {
         $this->assertSame(
             $expected,
-            LevenshteinDistance::calculate($old, $new, LevenshteinDistance::PROGRESS_FULL)
+            LD::calculate($old, $new, $calculateProgresses, $progressOptions)
         );
     }
 }

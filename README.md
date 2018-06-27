@@ -25,29 +25,53 @@ See `demo.php`.
 
 include __DIR__ . '/vendor/autoload.php';
 
-use Jfcherng\Utility\LevenshteinDistance;
+use Jfcherng\Utility\LevenshteinDistance as LD;
 
-$results = LevenshteinDistance::calculate(
-    // old string
-    '自訂取代詞語模組',
-    // new string
-    '自订取代词语模组！',
-    // progress type
-    LevenshteinDistance::PROGRESS_FULL
+$old = '自訂取代詞語模組';
+$new = '自订取代词语模组！';
+
+$results = LD::calculate(
+    $old, // old string
+    $new, // new string
+    true, // calculate edit progresses?
+    // progress options
+    LD::PROGRESS_OP_AS_STRING
 );
 
 // [
 //     'distance' => 5,
 //     'progresses' => [
-//         ['ins', 7],
-//         ['rep', 7, 7],
-//         ['cpy', 6, 6],
-//         ['rep', 5, 5],
-//         ['rep', 4, 4],
-//         ['cpy', 3, 3],
-//         ['cpy', 2, 2],
-//         ['rep', 1, 1],
-//         ['cpy', 0, 0],
+//         ['ins', 8, '！'],
+//         ['rep', 7, '组'],
+//         ['cpy', 6, '模'],
+//         ['rep', 5, '语'],
+//         ['rep', 4, '词'],
+//         ['cpy', 3, '代'],
+//         ['cpy', 2, '取'],
+//         ['rep', 1, '订'],
+//         ['cpy', 0, '自'],
+//     ],
+// ]
+var_dump($results);
+
+$results = LD::calculate(
+    $old, // old string
+    $new, // new string
+    true, // calculate edit progresses?
+    // progress options
+    LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_MERGE_NEIGHBOR
+);
+
+// [
+//     'distance' => 5,
+//     'progresses' => [
+//         ['ins', 8, '！', 1],
+//         ['rep', 7, '组', 1],
+//         ['cpy', 6, '模', 1],
+//         ['rep', 4, '词语', 2],
+//         ['cpy', 2, '取代', 2],
+//         ['rep', 1, '订', 1],
+//         ['cpy', 0, '自', 1],
 //     ],
 // ]
 var_dump($results);
@@ -57,11 +81,11 @@ var_dump($results);
 # Options
 
 
-## Progress Types
+## Progress Options
 
-- `LevenshteinDistance::PROGRESS_NONE`: Won't resolve the detailed edit progresses and directly return `null`.
-- `LevenshteinDistance::PROGRESS_SIMPLE`: Only resolve types (no position information) of detailed edit progresses.
-- `LevenshteinDistance::PROGRESS_FULL` *(default)*: Resolve entire detailed edit progresses.
+- `LD::PROGRESS_NO_COPY`: Do not include `COPY` operations in the progresses.
+- `LD::PROGRESS_MERGE_NEIGHBOR`: Merge neighbor progresses if possible.
+- `LD::PROGRESS_OP_AS_STRING`: Convert the operation in progresses from int to string.
 
 
 Supporters <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ATXYY9Y78EQ3Y" target="_blank"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" /></a>
