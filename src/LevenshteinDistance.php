@@ -326,7 +326,6 @@ class LevenshteinDistance
 
             $progresses[$step][2] = implode('', $chars);
         }
-        unset($progress);
 
         return $progresses;
     }
