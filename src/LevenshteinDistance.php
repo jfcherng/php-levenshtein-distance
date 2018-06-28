@@ -285,7 +285,7 @@ class LevenshteinDistance
             $progress = $progresses[$step];
 
             if ($last[0] === $progress[0]) {
-                $progress[3] = $last[3] + 1;
+                $progress[3] += $last[3];
             } else {
                 $merged[] = $last;
             }
