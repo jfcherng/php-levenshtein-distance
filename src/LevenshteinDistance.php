@@ -40,6 +40,7 @@ class LevenshteinDistance
     const PROGRESS_NO_COPY = 1 << 0;
     const PROGRESS_MERGE_NEIGHBOR = 1 << 1;
     const PROGRESS_OP_AS_STRING = 1 << 2;
+    const PROGRESS_PATCH_MODE = 1 << 3;
 
     /**
      * Prevent from out of memory. A negative number means no limitation.
@@ -142,17 +143,24 @@ class LevenshteinDistance
             $progresses = null;
         } else {
             // raw edit progresses
-            $progresses = static::calculateRawProgresses($dist, $progressOptions);
+            $rawProgresses = static::calculateRawProgresses($dist);
 
-            // resolve edit progresses
-            foreach ($progresses as &$progress) {
-                $progress = static::resolveProgressFully($olds, $news, ...$progress);
-            }
-            unset($progress);
+            // resolve raw edit progresses
+            $progresses = static::resolveRawProgresses($rawProgresses);
 
             // merge neighbor progresses
             if ($progressOptions & self::PROGRESS_MERGE_NEIGHBOR) {
                 $progresses = static::mergeNeighborProgresses($progresses);
+            }
+
+            // merge progresses like patches
+            if ($progressOptions & self::PROGRESS_PATCH_MODE) {
+                $progresses = static::makeProgressesPatch($olds, $news, $progresses);
+            }
+
+            // remove "COPY" operations
+            if ($progressOptions & self::PROGRESS_NO_COPY) {
+                $progresses = static::removeCopyProgresses($progresses);
             }
 
             // operation name as string
@@ -172,12 +180,11 @@ class LevenshteinDistance
     /**
      * Calculate the raw progresses.
      *
-     * @param array $dist            the distance
-     * @param int   $progressOptions the progress options
+     * @param array $dist the distance array
      *
      * @return array the raw progresses
      */
-    protected static function calculateRawProgresses(array $dist, int $progressOptions): array
+    protected static function calculateRawProgresses(array $dist): array
     {
         $m = count($dist) - 1;
         $n = count($dist[0]) - 1;
@@ -205,13 +212,7 @@ class LevenshteinDistance
                     break;
             }
 
-            // may skip a "copy" progress
-            if (
-                $trace[2] !== self::OP_COPY ||
-                ~$progressOptions & self::PROGRESS_NO_COPY
-            ) {
-                $progresses[] = [$x, $y, $trace[2]];
-            }
+            $progresses[] = [$x, $y, $trace[2]];
         }
 
         for (; $x > 0; --$x) {
@@ -226,36 +227,40 @@ class LevenshteinDistance
     }
 
     /**
-     * Resolve the progress fully.
+     * Resolve the raw progresses.
      *
-     * @param array $olds      the old characters
-     * @param array $news      the new characters
-     * @param int   $x         the old characters index
-     * @param int   $y         the new characters index
-     * @param int   $traceType the trace type
+     * @param array $rawProgresses the raw progresses
      *
-     * @return array the progress type, position and char
+     * @return array [operation, old position, new position, length]
      */
-    protected static function resolveProgressFully(array $olds, array $news, int $x, int $y, int $traceType): array
+    protected static function resolveRawProgresses(array $rawProgresses): array
     {
         static $callbacks;
 
         $callbacks = $callbacks ?? [
-            self::OP_COPY => function ($olds, $news, $x, $y): array {
-                return [self::OP_COPY, $x - 1, $olds[$x - 1]];
+            self::OP_COPY => function (int $x, int $y): array {
+                return [self::OP_COPY, $x - 1, $y - 1, 1];
             },
-            self::OP_DELETE => function ($olds, $news, $x, $y): array {
-                return [self::OP_DELETE, $x - 1, $olds[$x - 1]];
+            self::OP_DELETE => function (int $x, int $y): array {
+                return [self::OP_DELETE, $x - 1, $y, 1];
             },
-            self::OP_INSERT => function ($olds, $news, $x, $y): array {
-                return [self::OP_INSERT, $x, $news[$y - 1]];
+            self::OP_INSERT => function (int $x, int $y): array {
+                return [self::OP_INSERT, $x, $y - 1, 1];
             },
-            self::OP_REPLACE => function ($olds, $news, $x, $y): array {
-                return [self::OP_REPLACE, $x - 1, $news[$y - 1]];
+            self::OP_REPLACE => function (int $x, int $y): array {
+                return [self::OP_REPLACE, $x - 1, $y - 1, 1];
             },
         ];
 
-        return $callbacks[$traceType]($olds, $news, $x, $y);
+        foreach ($rawProgresses as &$rawProgress) {
+            $rawProgress = $callbacks[$rawProgress[2]](
+                $rawProgress[0],
+                $rawProgress[1]
+            );
+        }
+        unset($rawProgress);
+
+        return $rawProgresses;
     }
 
     /**
@@ -273,45 +278,77 @@ class LevenshteinDistance
             return [];
         }
 
-        // [operation, position, string, length]
         $merged = [];
-
         $last = $progresses[0];
-        $last[] = 1; // length
 
         for ($step = 1; $step < $progressesCount; ++$step) {
             $progress = $progresses[$step];
 
-            if (
-                $last[0] === $progress[0] &&
-                (
-                    (
-                        $last[0] === static::OP_INSERT &&
-                        $last[1] === $progress[1]
-                    ) ||
-                    (
-                        $last[0] !== static::OP_INSERT &&
-                        $last[1] === $progress[1] + 1
-                    )
-                )
-            ) {
-                $last = [
-                    $last[0],
-                    $progress[1],
-                    "{$progress[2]}{$last[2]}",
-                    $last[3] + 1,
-                ];
+            if ($last[0] === $progress[0]) {
+                $progress[3] = $last[3] + 1;
             } else {
                 $merged[] = $last;
-
-                $last = $progress;
-                $last[] = 1;
             }
+
+            $last = $progress;
         }
 
         $merged[] = $last;
 
         return $merged;
+    }
+
+    /**
+     * Make progresses just like patch.
+     *
+     * @param array $olds       the old characters
+     * @param array $news       the new characters
+     * @param array $progresses the progresses
+     *
+     * @return array
+     */
+    protected static function makeProgressesPatch(array $olds, array $news, array $progresses): array
+    {
+        foreach ($progresses as $step => [$operation, $oldPos, $newPos]) {
+            $length = $progresses[$step][3] ?? 1;
+
+            switch ($operation) {
+                default: // default never happens though
+                case self::OP_COPY:
+                case self::OP_DELETE:
+                    $chars = array_slice($olds, $oldPos, $length);
+                    break;
+                case self::OP_INSERT:
+                case self::OP_REPLACE:
+                    $chars = array_slice($news, $newPos, $length);
+                    break;
+            }
+
+            $progresses[$step][2] = implode('', $chars);
+        }
+        unset($progress);
+
+        return $progresses;
+    }
+
+    /**
+     * Remove "COPY" progresses.
+     *
+     * @param array $progresses the progresses
+     *
+     * @return array
+     */
+    protected static function removeCopyProgresses(array $progresses): array
+    {
+        $filtered = [];
+
+        foreach ($progresses as $progress) {
+            if ($progress[0] !== self::OP_COPY) {
+                $filtered[] = $progress;
+            }
+        }
+
+        return $filtered;
     }
 
     /**

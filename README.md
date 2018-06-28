@@ -35,21 +35,21 @@ $results = LD::calculate(
     $new, // new string
     true, // calculate edit progresses?
     // progress options
-    LD::PROGRESS_OP_AS_STRING
+    LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_PATCH_MODE
 );
 
 // [
 //     'distance' => 5,
 //     'progresses' => [
-//         ['ins', 8, '！'],
-//         ['rep', 7, '组'],
-//         ['cpy', 6, '模'],
-//         ['rep', 5, '语'],
-//         ['rep', 4, '词'],
-//         ['cpy', 3, '代'],
-//         ['cpy', 2, '取'],
-//         ['rep', 1, '订'],
-//         ['cpy', 0, '自'],
+//         ['ins', 8, '！', 1],
+//         ['rep', 7, '组', 1],
+//         ['cpy', 6, '模', 1],
+//         ['rep', 5, '语', 1],
+//         ['rep', 4, '词', 1],
+//         ['cpy', 3, '代', 1],
+//         ['cpy', 2, '取', 1],
+//         ['rep', 1, '订', 1],
+//         ['cpy', 0, '自', 1],
 //     ],
 // ]
 var_dump($results);
@@ -59,7 +59,7 @@ $results = LD::calculate(
     $new, // new string
     true, // calculate edit progresses?
     // progress options
-    LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_MERGE_NEIGHBOR
+    LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_PATCH_MODE | LD::PROGRESS_MERGE_NEIGHBOR
 );
 
 // [
@@ -78,14 +78,21 @@ var_dump($results);
 ```
 
 
-# Options
-
-
-## Progress Options
+# Progress Options
 
 - `LD::PROGRESS_NO_COPY`: Do not include `COPY` operations in the progresses.
 - `LD::PROGRESS_MERGE_NEIGHBOR`: Merge neighbor progresses if possible.
 - `LD::PROGRESS_OP_AS_STRING`: Convert the operation in progresses from int to string.
+- `LD::PROGRESS_PATCH_MODE`: Replace the new edit position with the corresponding string.
+
+
+# Return value
+
+1. The operation.
+1. The edit position for the new string.
+1. The edit position for the old string.
+   Or the corresponding string if `LD::PROGRESS_PATCH_MODE` is used.
+1. The edit length.
 
 
 Supporters <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ATXYY9Y78EQ3Y" target="_blank"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" /></a>

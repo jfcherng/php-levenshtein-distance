@@ -12,21 +12,21 @@ $results = LD::calculate(
     $new, // new string
     true, // calculate edit progresses?
     // progress options
-    LD::PROGRESS_OP_AS_STRING
+    LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_PATCH_MODE
 );
 
 // [
 //     'distance' => 5,
 //     'progresses' => [
-//         ['ins', 8, '！'],
-//         ['rep', 7, '组'],
-//         ['cpy', 6, '模'],
-//         ['rep', 5, '语'],
-//         ['rep', 4, '词'],
-//         ['cpy', 3, '代'],
-//         ['cpy', 2, '取'],
-//         ['rep', 1, '订'],
-//         ['cpy', 0, '自'],
+//         ['ins', 8, '！', 1],
+//         ['rep', 7, '组', 1],
+//         ['cpy', 6, '模', 1],
+//         ['rep', 5, '语', 1],
+//         ['rep', 4, '词', 1],
+//         ['cpy', 3, '代', 1],
+//         ['cpy', 2, '取', 1],
+//         ['rep', 1, '订', 1],
+//         ['cpy', 0, '自', 1],
 //     ],
 // ]
 var_dump($results);
@@ -36,7 +36,7 @@ $results = LD::calculate(
     $new, // new string
     true, // calculate edit progresses?
     // progress options
-    LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_MERGE_NEIGHBOR
+    LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_PATCH_MODE | LD::PROGRESS_MERGE_NEIGHBOR
 );
 
 // [
