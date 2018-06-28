@@ -309,9 +309,7 @@ class LevenshteinDistance
      */
     protected static function makeProgressesPatch(array $olds, array $news, array $progresses): array
     {
-        foreach ($progresses as $step => [$operation, $oldPos, $newPos]) {
-            $length = $progresses[$step][3] ?? 1;
-
+        foreach ($progresses as $step => [$operation, $oldPos, $newPos, $length]) {
             switch ($operation) {
                 default: // default never happens though
                 case self::OP_COPY:
