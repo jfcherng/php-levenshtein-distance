@@ -134,7 +134,7 @@ class LevenshteinDistanceTest extends TestCase
     {
         $this->assertSame(
             $expected,
-            LD::calculate($old, $new, $calculateProgresses, $progressOptions)
+            LD::staticCalculate($old, $new, $calculateProgresses, $progressOptions)
         );
     }
 }

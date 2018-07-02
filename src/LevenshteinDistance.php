@@ -43,20 +43,107 @@ class LevenshteinDistance
     const PROGRESS_PATCH_MODE = 1 << 3;
 
     /**
+     * The singleton.
+     *
+     * @var self
+     */
+    protected static $singleton;
+
+    /**
+     * Calculate the edit progresses.
+     *
+     * @var bool
+     */
+    protected $calculateProgresses = false;
+
+    /**
+     * The progresses options.
+     *
+     * @var int the progress options
+     */
+    protected $progressOptions = 0;
+
+    /**
      * Prevent from out of memory. A negative number means no limitation.
      *
      * @var float
      */
-    protected static $maxSize = 600 ** 2;
+    protected $maxSize = 600 ** 2;
+
+    /**
+     * The constructor.
+     *
+     * @param bool $calculateProgresses calculate the edit progresses
+     * @param int  $progressOptions     the progress options
+     */
+    public function __construct(bool $calculateProgresses = false, int $progressOptions = 0, float $maxSize = 600 ** 2)
+    {
+        $this
+            ->setCalculateProgresses($calculateProgresses)
+            ->setProgressOptions($progressOptions)
+            ->setMaxSize($maxSize);
+    }
+
+    /**
+     * Set the calculate progresses.
+     *
+     * @param bool $calculateProgresses calculate the edit progresses
+     *
+     * @return self
+     */
+    public function setCalculateProgresses(bool $calculateProgresses): self
+    {
+        $this->calculateProgresses = $calculateProgresses;
+
+        return $this;
+    }
+
+    /**
+     * Set the progress options.
+     *
+     * @param int $progressOptions the progress options
+     *
+     * @return self
+     */
+    public function setProgressOptions(int $progressOptions): self
+    {
+        $this->progressOptions = $progressOptions;
+
+        return $this;
+    }
 
     /**
      * Set the maximum size.
      *
      * @param float $size the size
+     *
+     * @return self
      */
-    public static function setMaxSize(float $size): void
+    public function setMaxSize(float $size): self
     {
-        static::$maxSize = $size;
+        $this->maxSize = $size;
+
+        return $this;
+    }
+
+    /**
+     * Get the calculate progresses.
+     *
+     * @return bool
+     */
+    public function getCalculateProgresses(): bool
+    {
+        return $this->calculateProgresses;
+    }
+
+    /**
+     * Get the progress options.
+     *
+     * @return int
+     */
+    public function getProgressOptions(): int
+    {
+        return $this->progressOptions;
     }
 
     /**
@@ -64,9 +151,21 @@ class LevenshteinDistance
      *
      * @return float the maximum size
      */
-    public static function getMaxSize(): float
+    public function getMaxSize(): float
     {
-        return static::$maxSize;
+        return $this->maxSize;
+    }
+
+    /**
+     * Get the singleton.
+     *
+     * @return self
+     */
+    public static function getInstance(): self
+    {
+        static::$singleton = static::$singleton ?? new static();
+
+        return static::$singleton;
     }
 
     /**
@@ -76,17 +175,17 @@ class LevenshteinDistance
      * @param string $new                 the new string
      * @param bool   $calculateProgresses calculate the edit progresses
      * @param int    $progressOptions     the progress options
+     * @param float  $maxSize             the maximum size
      *
      * @return array the distance and progresses
      */
-    public static function calculate(string $old, string $new, bool $calculateProgresses = true, int $progressOptions = 0): array
+    public static function staticCalculate(string $old, string $new, bool $calculateProgresses = false, int $progressOptions = 0, float $maxSize = 600 ** 2): array
     {
-        return static::calculateWithArray(
-            preg_split('//uS', $old, -1, PREG_SPLIT_NO_EMPTY),
-            preg_split('//uS', $new, -1, PREG_SPLIT_NO_EMPTY),
-            $calculateProgresses,
-            $progressOptions
-        );
+        return static::getInstance()
+            ->setCalculateProgresses($calculateProgresses)
+            ->setProgressOptions($progressOptions)
+            ->setMaxSize($maxSize)
+            ->calculate($old, $new);
     }
 
     /**
@@ -97,23 +196,24 @@ class LevenshteinDistance
      *
      * @phan-suppress PhanTypeInvalidDimOffset
      *
-     * @param string[] $olds                the array of old chars
-     * @param string[] $news                the array of new chars
-     * @param bool     $calculateProgresses calculate the edit progresses
-     * @param int      $progressOptions     the progress options
+     * @param string $old the old string
+     * @param string $new the new string
      *
      * @throws RuntimeException
      *
      * @return array the distance and progresses
      */
-    public static function calculateWithArray(array $olds, array $news, bool $calculateProgresses = true, int $progressOptions = 0): array
+    public function calculate(string $old, string $new): array
     {
+        $olds = preg_split('//uS', $old, -1, PREG_SPLIT_NO_EMPTY);
+        $news = preg_split('//uS', $new, -1, PREG_SPLIT_NO_EMPTY);
+
         $m = count($olds);
         $n = count($news);
 
         // prevent from out of memory
-        if (static::$maxSize >= 0 && $n > 0 && $m > static::$maxSize / $n) {
-            throw new RuntimeException('Max allowed size is ' . static::$maxSize . " but get {$m} * {$n}.");
+        if ($this->maxSize >= 0 && $n > 0 && $m > $this->maxSize / $n) {
+            throw new RuntimeException('Max allowed size is ' . $this->maxSize . " but get {$m} * {$n}.");
         }
 
         // initial boundary conditions
@@ -139,33 +239,33 @@ class LevenshteinDistance
         }
 
         // calculate edit progresses
-        if (!$calculateProgresses) {
+        if (!$this->calculateProgresses) {
             $progresses = null;
         } else {
             // raw edit progresses
-            $rawProgresses = static::calculateRawProgresses($dist);
+            $rawProgresses = $this->calculateRawProgresses($dist);
 
             // resolve raw edit progresses
-            $progresses = static::resolveRawProgresses($rawProgresses);
+            $progresses = $this->resolveRawProgresses($rawProgresses);
 
             // merge neighbor progresses
-            if ($progressOptions & self::PROGRESS_MERGE_NEIGHBOR) {
-                $progresses = static::mergeNeighborProgresses($progresses);
+            if ($this->progressOptions & self::PROGRESS_MERGE_NEIGHBOR) {
+                $progresses = $this->mergeNeighborProgresses($progresses);
             }
 
             // merge progresses like patches
-            if ($progressOptions & self::PROGRESS_PATCH_MODE) {
-                $progresses = static::makeProgressesPatch($olds, $news, $progresses);
+            if ($this->progressOptions & self::PROGRESS_PATCH_MODE) {
+                $progresses = $this->makeProgressesPatch($olds, $news, $progresses);
             }
 
             // remove "COPY" operations
-            if ($progressOptions & self::PROGRESS_NO_COPY) {
-                $progresses = static::removeCopyProgresses($progresses);
+            if ($this->progressOptions & self::PROGRESS_NO_COPY) {
+                $progresses = $this->removeCopyProgresses($progresses);
             }
 
             // operation name as string
-            if ($progressOptions & self::PROGRESS_OP_AS_STRING) {
-                $progresses = static::stringifyOperations($progresses);
+            if ($this->progressOptions & self::PROGRESS_OP_AS_STRING) {
+                $progresses = $this->stringifyOperations($progresses);
             }
         }
 
@@ -184,7 +284,7 @@ class LevenshteinDistance
      *
      * @return array the raw progresses
      */
-    protected static function calculateRawProgresses(array $dist): array
+    protected function calculateRawProgresses(array $dist): array
     {
         $m = count($dist) - 1;
         $n = count($dist[0]) - 1;
@@ -233,7 +333,7 @@ class LevenshteinDistance
      *
      * @return array [operation, old position, new position, length]
      */
-    protected static function resolveRawProgresses(array $rawProgresses): array
+    protected function resolveRawProgresses(array $rawProgresses): array
     {
         static $callbacks;
 
@@ -270,7 +370,7 @@ class LevenshteinDistance
      *
      * @return array
      */
-    protected static function mergeNeighborProgresses(array $progresses): array
+    protected function mergeNeighborProgresses(array $progresses): array
     {
         $progressesCount = count($progresses);
 
@@ -307,7 +407,7 @@ class LevenshteinDistance
      *
      * @return array
      */
-    protected static function makeProgressesPatch(array $olds, array $news, array $progresses): array
+    protected function makeProgressesPatch(array $olds, array $news, array $progresses): array
     {
         foreach ($progresses as $step => [$operation, $oldPos, $newPos, $length]) {
             switch ($operation) {
@@ -335,7 +435,7 @@ class LevenshteinDistance
      *
      * @return array
      */
-    protected static function removeCopyProgresses(array $progresses): array
+    protected function removeCopyProgresses(array $progresses): array
     {
         $filtered = [];
 
@@ -355,7 +455,7 @@ class LevenshteinDistance
      *
      * @return array
      */
-    protected static function stringifyOperations(array $progresses): array
+    protected function stringifyOperations(array $progresses): array
     {
         foreach ($progresses as &$progress) {
             $progress[0] = static::OP_INT2STR_MAP[$progress[0]];
