@@ -7,7 +7,16 @@ use Jfcherng\Utility\LevenshteinDistance as LD;
 $old = '自訂取代詞語模組';
 $new = '自订取代词语模组！';
 
-$results = LD::calculate(
+$calculator = new LD(
+    true, // calculate edit progresses?
+    // progress options
+    LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_PATCH_MODE
+);
+
+$results = $calculator->calculate($old, $new);
+
+// this is the same but using an internal singleton
+$results = LD::staticCalculate(
     $old, // old string
     $new, // new string
     true, // calculate edit progresses?
@@ -31,7 +40,7 @@ $results = LD::calculate(
 // ]
 var_dump($results);
 
-$results = LD::calculate(
+$results = LD::staticCalculate(
     $old, // old string
     $new, // new string
     true, // calculate edit progresses?
