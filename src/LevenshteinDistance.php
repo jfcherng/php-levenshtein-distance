@@ -130,7 +130,7 @@ class LevenshteinDistance
     /**
      * Set the cost map.
      *
-     * @param int[] the cost map
+     * @param int[] $costMap the cost map
      *
      * @return self
      */
