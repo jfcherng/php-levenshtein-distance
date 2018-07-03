@@ -36,6 +36,14 @@ class LevenshteinDistance
         self::OP_REPLACE => self::OP_REPLACE_STR,
     ];
 
+    // the cost of operations
+    const COST_MAP_DEFAULT = [
+        self::OP_COPY => 0,
+        self::OP_DELETE => 1,
+        self::OP_INSERT => 1,
+        self::OP_REPLACE => 1,
+    ];
+
     // progress options
     const PROGRESS_NO_COPY = 1 << 0;
     const PROGRESS_MERGE_NEIGHBOR = 1 << 1;
@@ -62,6 +70,13 @@ class LevenshteinDistance
      * @var int the progress options
      */
     protected $progressOptions = 0;
+
+    /**
+     * The cost of the "REPLACE" operation.
+     *
+     * @var int[]
+     */
+    protected $costMap = self::COST_MAP_DEFAULT;
 
     /**
      * Prevent from out of memory. A negative number means no limitation.
@@ -113,6 +128,20 @@ class LevenshteinDistance
     }
 
     /**
+     * Set the cost map.
+     *
+     * @param int[] the cost map
+     *
+     * @return self
+     */
+    public function setCostMap(array $costMap): self
+    {
+        $this->costMap = $costMap + self::COST_MAP_DEFAULT;
+
+        return $this;
+    }
+
+    /**
      * Set the maximum size.
      *
      * @param float $size the size
@@ -147,6 +176,16 @@ class LevenshteinDistance
     }
 
     /**
+     * Get the replace map.
+     *
+     * @return int[]
+     */
+    public function getCostMap(): array
+    {
+        return $this->costMap;
+    }
+
+    /**
      * Get the maximum size.
      *
      * @return float the maximum size
@@ -175,16 +214,14 @@ class LevenshteinDistance
      * @param string $new                 the new string
      * @param bool   $calculateProgresses calculate the edit progresses
      * @param int    $progressOptions     the progress options
-     * @param float  $maxSize             the maximum size
      *
      * @return array the distance and progresses
      */
-    public static function staticCalculate(string $old, string $new, bool $calculateProgresses = false, int $progressOptions = 0, float $maxSize = 600 ** 2): array
+    public static function staticCalculate(string $old, string $new, bool $calculateProgresses = false, int $progressOptions = 0): array
     {
         return static::getInstance()
             ->setCalculateProgresses($calculateProgresses)
             ->setProgressOptions($progressOptions)
-            ->setMaxSize($maxSize)
             ->calculate($old, $new);
     }
 
@@ -205,7 +242,7 @@ class LevenshteinDistance
         $dist = $this->calculateDistance($olds, $news);
 
         // calculate edit progresses
-        $progresses =  $this->calculateProgresses($olds, $news, $dist);
+        $progresses = $this->calculateProgresses($olds, $news, $dist);
 
         return [
             // (int) Levenshtein distance
@@ -253,11 +290,11 @@ class LevenshteinDistance
         for ($x = 1; $x <= $m; ++$x) {
             for ($y = 1; $y <= $n; ++$y) {
                 $dist[$x][$y] = $olds[$x - 1] === $news[$y - 1]
-                    ? $dist[$x - 1][$y - 1] // copy
-                    : 1 + min(
-                        $dist[$x - 1][$y], // delete
-                        $dist[$x][$y - 1], // insert
-                        $dist[$x - 1][$y - 1] // replace
+                    ? $dist[$x - 1][$y - 1] + $this->costMap[self::OP_COPY] // copy
+                    : min(
+                        $dist[$x - 1][$y] + $this->costMap[self::OP_DELETE], // delete
+                        $dist[$x][$y - 1] + $this->costMap[self::OP_INSERT], // insert
+                        $dist[$x - 1][$y - 1] + $this->costMap[self::OP_REPLACE] // replace
                     );
             }
         }
@@ -328,18 +365,18 @@ class LevenshteinDistance
             $x !== 0 && $y !== 0;
             [$x, $y] = $trace
         ) {
-            switch ($dist[$x][$y] - 1) {
+            switch ($dist[$x][$y]) {
                 default: // default never happens though
-                case $dist[$x - 1][$y]:
+                case $dist[$x - 1][$y] + $this->costMap[self::OP_DELETE]:
                     $trace = [$x - 1, $y, self::OP_DELETE];
                     break;
-                case $dist[$x][$y - 1]:
+                case $dist[$x][$y - 1] + $this->costMap[self::OP_INSERT]:
                     $trace = [$x, $y - 1, self::OP_INSERT];
                     break;
-                case $dist[$x - 1][$y - 1]:
+                case $dist[$x - 1][$y - 1] + $this->costMap[self::OP_REPLACE]:
                     $trace = [$x - 1, $y - 1, self::OP_REPLACE];
                     break;
-                case $dist[$x - 1][$y - 1] - 1:
+                case $dist[$x - 1][$y - 1] + $this->costMap[self::OP_COPY]:
                     $trace = [$x - 1, $y - 1, self::OP_COPY];
                     break;
             }
@@ -469,15 +506,14 @@ class LevenshteinDistance
      */
     protected function removeCopyProgresses(array $progresses): array
     {
-        $filtered = [];
-
-        foreach ($progresses as $progress) {
-            if ($progress[0] !== self::OP_COPY) {
-                $filtered[] = $progress;
+        foreach ($progresses as $step => $progress) {
+            if ($progress[0] === self::OP_COPY) {
+                unset($progresses[$step]);
             }
         }
 
-        return $filtered;
+        // resort keys
+        return array_values($progresses);
     }
 
     /**

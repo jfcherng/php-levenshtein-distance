@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 class LevenshteinDistanceTest extends TestCase
 {
     /**
-     * Data provider for LevenshteinDistance::calculate.
+     * Data provider for calculate* function in LevenshteinDistance.
      *
      * @return array the data provider
      */
@@ -118,10 +118,56 @@ class LevenshteinDistanceTest extends TestCase
     }
 
     /**
+     * Data provider for testing cost map.
+     *
+     * @return array the data provider
+     */
+    public function costMapDataProvider(): array
+    {
+        return [
+            [
+                'Hi man!',
+                'Heh man!',
+                true,
+                LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_MERGE_NEIGHBOR | LD::PROGRESS_PATCH_MODE,
+                [LD::OP_REPLACE => INF], // disallow "REPLACE" operation
+                [
+                    'distance' => 3,
+                    'progresses' => [
+                        ['cpy', 2, ' man!', 5],
+                        ['del', 1, 'i', 1],
+                        ['ins', 1, 'eh', 2],
+                        ['cpy', 0, 'H', 1],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Test the LevenshteinDistance::staticCalculate.
+     *
+     * @covers       \Jfcherng\Utility\LevenshteinDistance::staticCalculate
+     * @dataProvider calculateDataProvider
+     *
+     * @param string $old                 the old
+     * @param string $new                 the new
+     * @param bool   $calculateProgresses calculate the edit progresses
+     * @param int    $progressOptions     the progress options
+     * @param array  $expected            the expected
+     */
+    public function testStaticCalculate(string $old, string $new, bool $calculateProgresses, int $progressOptions, array $expected): void
+    {
+        $this->assertSame(
+            $expected,
+            LD::staticCalculate($old, $new, $calculateProgresses, $progressOptions)
+        );
+    }
+
+    /**
      * Test the LevenshteinDistance::calculate.
      *
      * @covers       \Jfcherng\Utility\LevenshteinDistance::calculate
-     * @covers       \Jfcherng\Utility\LevenshteinDistance::calculateWithArray
      * @dataProvider calculateDataProvider
      *
      * @param string $old                 the old
@@ -134,7 +180,34 @@ class LevenshteinDistanceTest extends TestCase
     {
         $this->assertSame(
             $expected,
-            LD::staticCalculate($old, $new, $calculateProgresses, $progressOptions)
+            (new LD())
+                ->setCalculateProgresses($calculateProgresses)
+                ->setProgressOptions($progressOptions)
+                ->calculate($old, $new)
+        );
+    }
+
+    /**
+     * Test the cost map is working as intended.
+     *
+     * @dataProvider costMapDataProvider
+     *
+     * @param string $old                 the old
+     * @param string $new                 the new
+     * @param bool   $calculateProgresses calculate the edit progresses
+     * @param int    $progressOptions     the progress options
+     * @param int[]  $costMap             the cost map
+     * @param array  $expected            the expected
+     */
+    public function testCostMap(string $old, string $new, bool $calculateProgresses, int $progressOptions, array $costMap, array $expected): void
+    {
+        $this->assertSame(
+            $expected,
+            (new LD())
+                ->setCalculateProgresses($calculateProgresses)
+                ->setProgressOptions($progressOptions)
+                ->setCostMap($costMap)
+                ->calculate($old, $new)
         );
     }
 }
