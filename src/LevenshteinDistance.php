@@ -51,13 +51,6 @@ class LevenshteinDistance
     const PROGRESS_PATCH_MODE = 1 << 3;
 
     /**
-     * The singleton.
-     *
-     * @var self
-     */
-    protected static $singleton;
-
-    /**
      * Calculate the edit progresses.
      *
      * @var bool
@@ -202,9 +195,13 @@ class LevenshteinDistance
      */
     public static function getInstance(): self
     {
-        static::$singleton = static::$singleton ?? new static();
+        static $singleton;
 
-        return static::$singleton;
+        if (!isset($singleton)) {
+            $singleton = new static();
+        }
+
+        return $singleton;
     }
 
     /**
@@ -366,7 +363,6 @@ class LevenshteinDistance
             [$x, $y] = $trace
         ) {
             switch ($dist[$x][$y]) {
-                default: // default never happens though
                 case $dist[$x - 1][$y] + $this->costMap[self::OP_DELETE]:
                     $trace = [$x - 1, $y, self::OP_DELETE];
                     break;
@@ -376,7 +372,7 @@ class LevenshteinDistance
                 case $dist[$x - 1][$y - 1] + $this->costMap[self::OP_REPLACE]:
                     $trace = [$x - 1, $y - 1, self::OP_REPLACE];
                     break;
-                case $dist[$x - 1][$y - 1] + $this->costMap[self::OP_COPY]:
+                default:
                     $trace = [$x - 1, $y - 1, self::OP_COPY];
                     break;
             }
