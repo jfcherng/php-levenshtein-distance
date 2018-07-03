@@ -191,15 +191,8 @@ class LevenshteinDistance
     /**
      * Calculate the Levenshtein distance and edit progresses.
      *
-     * $dist[x][y] means the Levenshtein distance betweewn $olds[0:x] and $news[0:y].
-     * That is, $dist[oldsCount][oldsCount] is what we are interested in.
-     *
-     * @phan-suppress PhanTypeInvalidDimOffset
-     *
      * @param string $old the old string
      * @param string $new the new string
-     *
-     * @throws RuntimeException
      *
      * @return array the distance and progresses
      */
@@ -208,6 +201,37 @@ class LevenshteinDistance
         $olds = preg_split('//uS', $old, -1, PREG_SPLIT_NO_EMPTY);
         $news = preg_split('//uS', $new, -1, PREG_SPLIT_NO_EMPTY);
 
+        // calculate edit distance matrix
+        $dist = $this->calculateDistance($olds, $news);
+
+        // calculate edit progresses
+        $progresses =  $this->calculateProgresses($olds, $news, $dist);
+
+        return [
+            // (int) Levenshtein distance
+            'distance' => $dist[count($olds)][count($news)],
+            // (null|array) edit progresses
+            'progresses' => $progresses,
+        ];
+    }
+
+    /**
+     * Calculate the edit distance matrix.
+     *
+     * $dist[x][y] means the Levenshtein distance betweewn $olds[0:x] and $news[0:y].
+     * That is, $dist[oldsCount][oldsCount] is what we are interested in.
+     *
+     * @phan-suppress PhanTypeInvalidDimOffset
+     *
+     * @param array $olds the olds
+     * @param array $news the news
+     *
+     * @throws RuntimeException
+     *
+     * @return array the edit distance matrix
+     */
+    protected function calculateDistance(array $olds, array $news): array
+    {
         $m = count($olds);
         $n = count($news);
 
@@ -238,43 +262,51 @@ class LevenshteinDistance
             }
         }
 
-        // calculate edit progresses
+        return $dist;
+    }
+
+    /**
+     * Calculate the edit distance matrix.
+     *
+     * @param array $olds the olds
+     * @param array $news the news
+     * @param array $dist the edit distance matrix
+     *
+     * @return null|array the edit progresses
+     */
+    protected function calculateProgresses(array $olds, array $news, array $dist): ?array
+    {
         if (!$this->calculateProgresses) {
-            $progresses = null;
-        } else {
-            // raw edit progresses
-            $rawProgresses = $this->calculateRawProgresses($dist);
-
-            // resolve raw edit progresses
-            $progresses = $this->resolveRawProgresses($rawProgresses);
-
-            // merge neighbor progresses
-            if ($this->progressOptions & self::PROGRESS_MERGE_NEIGHBOR) {
-                $progresses = $this->mergeNeighborProgresses($progresses);
-            }
-
-            // merge progresses like patches
-            if ($this->progressOptions & self::PROGRESS_PATCH_MODE) {
-                $progresses = $this->makeProgressesPatch($olds, $news, $progresses);
-            }
-
-            // remove "COPY" operations
-            if ($this->progressOptions & self::PROGRESS_NO_COPY) {
-                $progresses = $this->removeCopyProgresses($progresses);
-            }
-
-            // operation name as string
-            if ($this->progressOptions & self::PROGRESS_OP_AS_STRING) {
-                $progresses = $this->stringifyOperations($progresses);
-            }
+            return null;
         }
 
-        return [
-            // (int) Levenshtein distance
-            'distance' => $dist[$m][$n],
-            // (null|array) edit progresses
-            'progresses' => $progresses,
-        ];
+        // raw edit progresses
+        $rawProgresses = $this->calculateRawProgresses($dist);
+
+        // resolve raw edit progresses
+        $progresses = $this->resolveRawProgresses($rawProgresses);
+
+        // merge neighbor progresses
+        if ($this->progressOptions & self::PROGRESS_MERGE_NEIGHBOR) {
+            $progresses = $this->mergeNeighborProgresses($progresses);
+        }
+
+        // merge progresses like patches
+        if ($this->progressOptions & self::PROGRESS_PATCH_MODE) {
+            $progresses = $this->makeProgressesPatch($olds, $news, $progresses);
+        }
+
+        // remove "COPY" operations
+        if ($this->progressOptions & self::PROGRESS_NO_COPY) {
+            $progresses = $this->removeCopyProgresses($progresses);
+        }
+
+        // operation name as string
+        if ($this->progressOptions & self::PROGRESS_OP_AS_STRING) {
+            $progresses = $this->stringifyOperations($progresses);
+        }
+
+        return $progresses;
     }
 
     /**
