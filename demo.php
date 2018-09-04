@@ -38,7 +38,7 @@ $results = LD::staticCalculate(
 //         ['cpy', 0, '自', 1],
 //     ],
 // ]
-var_dump($results);
+\var_dump($results);
 
 $results = LD::staticCalculate(
     $old, // old string
@@ -60,4 +60,4 @@ $results = LD::staticCalculate(
 //         ['cpy', 0, '自', 1],
 //     ],
 // ]
-var_dump($results);
+\var_dump($results);

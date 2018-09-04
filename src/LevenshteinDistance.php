@@ -232,8 +232,8 @@ class LevenshteinDistance
      */
     public function calculate(string $old, string $new): array
     {
-        $olds = preg_split('//uS', $old, -1, PREG_SPLIT_NO_EMPTY);
-        $news = preg_split('//uS', $new, -1, PREG_SPLIT_NO_EMPTY);
+        $olds = \preg_split('//uS', $old, -1, \PREG_SPLIT_NO_EMPTY);
+        $news = \preg_split('//uS', $new, -1, \PREG_SPLIT_NO_EMPTY);
 
         // calculate edit distance matrix
         $dist = $this->calculateDistance($olds, $news);
@@ -243,7 +243,7 @@ class LevenshteinDistance
 
         return [
             // (int) Levenshtein distance
-            'distance' => $dist[count($olds)][count($news)],
+            'distance' => $dist[\count($olds)][\count($news)],
             // (null|array) edit progresses
             'progresses' => $progresses,
         ];
@@ -266,8 +266,8 @@ class LevenshteinDistance
      */
     protected function calculateDistance(array $olds, array $news): array
     {
-        $m = count($olds);
-        $n = count($news);
+        $m = \count($olds);
+        $n = \count($news);
 
         // prevent from out of memory
         if ($this->maxSize >= 0 && $n > 0 && $m > $this->maxSize / $n) {
@@ -288,7 +288,7 @@ class LevenshteinDistance
             for ($y = 1; $y <= $n; ++$y) {
                 $dist[$x][$y] = $olds[$x - 1] === $news[$y - 1]
                     ? $dist[$x - 1][$y - 1] + $this->costMap[self::OP_COPY] // copy
-                    : min(
+                    : \min(
                         $dist[$x - 1][$y] + $this->costMap[self::OP_DELETE], // delete
                         $dist[$x][$y - 1] + $this->costMap[self::OP_INSERT], // insert
                         $dist[$x - 1][$y - 1] + $this->costMap[self::OP_REPLACE] // replace
@@ -352,8 +352,8 @@ class LevenshteinDistance
      */
     protected function calculateRawProgresses(array $dist): array
     {
-        $m = count($dist) - 1;
-        $n = count($dist[0]) - 1;
+        $m = \count($dist) - 1;
+        $n = \count($dist[0]) - 1;
 
         $progresses = [];
 
@@ -437,7 +437,7 @@ class LevenshteinDistance
      */
     protected function mergeNeighborProgresses(array $progresses): array
     {
-        $progressesCount = count($progresses);
+        $progressesCount = \count($progresses);
 
         if ($progressesCount === 0) {
             return [];
@@ -479,15 +479,15 @@ class LevenshteinDistance
                 default: // default never happens though
                 case self::OP_COPY:
                 case self::OP_DELETE:
-                    $chars = array_slice($olds, $oldPos, $length);
+                    $chars = \array_slice($olds, $oldPos, $length);
                     break;
                 case self::OP_INSERT:
                 case self::OP_REPLACE:
-                    $chars = array_slice($news, $newPos, $length);
+                    $chars = \array_slice($news, $newPos, $length);
                     break;
             }
 
-            $progresses[$step][2] = implode('', $chars);
+            $progresses[$step][2] = \implode('', $chars);
         }
 
         return $progresses;
@@ -509,7 +509,7 @@ class LevenshteinDistance
         }
 
         // resort keys
-        return array_values($progresses);
+        return \array_values($progresses);
     }
 
     /**
