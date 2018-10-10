@@ -12,7 +12,7 @@ Calculate the Levenshtein distance and edit progresses between two strings.
 # Installation
 
 ```
-$ composer require jfcherng/php-levenshtein-distance --no-dev
+$ composer require jfcherng/php-levenshtein-distance
 ```
 
 
