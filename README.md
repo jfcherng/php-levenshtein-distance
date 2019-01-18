@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2e8fc5053c9c47e59b25ba5e56890576)](https://app.codacy.com/app/jfcherng/php-levenshtein-distance?utm_source=github.com&utm_medium=referral&utm_content=jfcherng/php-levenshtein-distance&utm_campaign=Badge_Grade_Settings)
 # php-levenshtein-distance [![Build Status](https://travis-ci.org/jfcherng/php-levenshtein-distance.svg?branch=master)](https://travis-ci.org/jfcherng/php-levenshtein-distance)
 
 Calculate the Levenshtein distance and edit progresses between two strings.
