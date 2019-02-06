@@ -15,12 +15,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "Jfcherng\\Utility\\": "src/"
+            "Jfcherng\\Diff\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Jfcherng\\Utility\\Test\\": "tests/"
+            "Jfcherng\\Diff\\Test\\": "tests/"
         }
     },
     "config": {

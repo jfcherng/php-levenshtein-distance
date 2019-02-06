@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Jfcherng\Utility\Test;
+namespace Jfcherng\Diff\Test;
 
-use Jfcherng\Utility\LevenshteinDistance as LD;
+use Jfcherng\Diff\LevenshteinDistance as LD;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -147,7 +147,7 @@ class LevenshteinDistanceTest extends TestCase
     /**
      * Test the LevenshteinDistance::staticCalculate.
      *
-     * @covers       \Jfcherng\Utility\LevenshteinDistance::staticCalculate
+     * @covers       \Jfcherng\Diff\LevenshteinDistance::staticCalculate
      * @dataProvider calculateDataProvider
      *
      * @param string $old                 the old
@@ -167,7 +167,7 @@ class LevenshteinDistanceTest extends TestCase
     /**
      * Test the LevenshteinDistance::calculate.
      *
-     * @covers       \Jfcherng\Utility\LevenshteinDistance::calculate
+     * @covers       \Jfcherng\Diff\LevenshteinDistance::calculate
      * @dataProvider calculateDataProvider
      *
      * @param string $old                 the old

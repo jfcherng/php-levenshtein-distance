@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Jfcherng\Utility;
 
 use RuntimeException;
+namespace Jfcherng\Diff;
 
 /**
  * Calculate the Levenshtein distance and edit progresses betweewn two strings.
