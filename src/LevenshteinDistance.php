@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-
-use RuntimeException;
 namespace Jfcherng\Diff;
 
 /**
@@ -14,7 +12,7 @@ namespace Jfcherng\Diff;
  * @author Jack Cherng <jfcherng@gmail.com>
  * @author caojiandong <neu.loner@gmail.com>
  */
-class LevenshteinDistance
+final class LevenshteinDistance
 {
     // operations enum
     const OP_COPY = 0;
@@ -260,7 +258,7 @@ class LevenshteinDistance
      * @param array $olds the olds
      * @param array $news the news
      *
-     * @throws RuntimeException
+     * @throws \RuntimeException
      *
      * @return array the edit distance matrix
      */
@@ -271,7 +269,7 @@ class LevenshteinDistance
 
         // prevent from out of memory
         if ($this->maxSize >= 0 && $n > 0 && $m > $this->maxSize / $n) {
-            throw new RuntimeException('Max allowed size is ' . $this->maxSize . " but get {$m} * {$n}.");
+            throw new \RuntimeException('Max allowed size is ' . $this->maxSize . " but get {$m} * {$n}.");
         }
 
         // initial boundary conditions
