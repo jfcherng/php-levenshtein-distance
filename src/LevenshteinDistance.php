@@ -53,28 +53,28 @@ final class LevenshteinDistance
      *
      * @var bool
      */
-    protected $calculateProgresses = false;
+    private $calculateProgresses = false;
 
     /**
      * The progresses options.
      *
      * @var int the progress options
      */
-    protected $progressOptions = 0;
+    private $progressOptions = 0;
 
     /**
      * The cost of the "REPLACE" operation.
      *
      * @var int[]
      */
-    protected $costMap = self::COST_MAP_DEFAULT;
+    private $costMap = self::COST_MAP_DEFAULT;
 
     /**
      * Prevent from out of memory. A negative number means no limitation.
      *
      * @var float
      */
-    protected $maxSize = 600 ** 2;
+    private $maxSize = 600 ** 2;
 
     /**
      * The constructor.
@@ -262,7 +262,7 @@ final class LevenshteinDistance
      *
      * @return array the edit distance matrix
      */
-    protected function calculateDistance(array $olds, array $news): array
+    private function calculateDistance(array $olds, array $news): array
     {
         $m = \count($olds);
         $n = \count($news);
@@ -306,7 +306,7 @@ final class LevenshteinDistance
      *
      * @return null|array the edit progresses
      */
-    protected function calculateProgresses(array $olds, array $news, array $dist): ?array
+    private function calculateProgresses(array $olds, array $news, array $dist): ?array
     {
         if (!$this->calculateProgresses) {
             return null;
@@ -348,7 +348,7 @@ final class LevenshteinDistance
      *
      * @return array the raw progresses
      */
-    protected function calculateRawProgresses(array $dist): array
+    private function calculateRawProgresses(array $dist): array
     {
         $m = \count($dist) - 1;
         $n = \count($dist[0]) - 1;
@@ -396,7 +396,7 @@ final class LevenshteinDistance
      *
      * @return array [operation, old position, new position, length]
      */
-    protected function resolveRawProgresses(array $rawProgresses): array
+    private function resolveRawProgresses(array $rawProgresses): array
     {
         static $callbacks;
 
@@ -433,7 +433,7 @@ final class LevenshteinDistance
      *
      * @return array
      */
-    protected function mergeNeighborProgresses(array $progresses): array
+    private function mergeNeighborProgresses(array $progresses): array
     {
         $progressesCount = \count($progresses);
 
@@ -470,7 +470,7 @@ final class LevenshteinDistance
      *
      * @return array
      */
-    protected function makeProgressesPatch(array $olds, array $news, array $progresses): array
+    private function makeProgressesPatch(array $olds, array $news, array $progresses): array
     {
         foreach ($progresses as $step => [$operation, $oldPos, $newPos, $length]) {
             if ($operation & (self::OP_CPY | self::OP_DEL)) {
@@ -492,7 +492,7 @@ final class LevenshteinDistance
      *
      * @return array
      */
-    protected function removeCopyProgresses(array $progresses): array
+    private function removeCopyProgresses(array $progresses): array
     {
         foreach ($progresses as $step => $progress) {
             if ($progress[0] === self::OP_CPY) {
@@ -511,7 +511,7 @@ final class LevenshteinDistance
      *
      * @return array
      */
-    protected function stringifyOperations(array $progresses): array
+    private function stringifyOperations(array $progresses): array
     {
         foreach ($progresses as &$progress) {
             $progress[0] = static::OP_INT2STR_MAP[$progress[0]];
