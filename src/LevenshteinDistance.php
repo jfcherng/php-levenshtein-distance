@@ -477,6 +477,8 @@ final class LevenshteinDistance
                 $chars = \array_slice($olds, $oldPos, $length);
             } elseif ($operation & (self::OP_INS | self::OP_REP)) {
                 $chars = \array_slice($news, $newPos, $length);
+            } else {
+                $chars = [];
             }
 
             $progresses[$step][2] = \implode('', $chars);
