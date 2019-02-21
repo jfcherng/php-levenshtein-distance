@@ -15,31 +15,31 @@ namespace Jfcherng\Diff;
 final class LevenshteinDistance
 {
     // operations enum
-    const OP_COPY = 0;
-    const OP_DELETE = 1;
-    const OP_INSERT = 2;
-    const OP_REPLACE = 3;
+    const OP_CPY = 1 << 0;
+    const OP_DEL = 1 << 1;
+    const OP_INS = 1 << 2;
+    const OP_REP = 1 << 3;
 
     // operations enum
-    const OP_COPY_STR = 'cpy';
-    const OP_DELETE_STR = 'del';
-    const OP_INSERT_STR = 'ins';
-    const OP_REPLACE_STR = 'rep';
+    const OP_CPY_STR = 'cpy';
+    const OP_DEL_STR = 'del';
+    const OP_INS_STR = 'ins';
+    const OP_REP_STR = 'rep';
 
     // operations enum
     const OP_INT2STR_MAP = [
-        self::OP_COPY => self::OP_COPY_STR,
-        self::OP_DELETE => self::OP_DELETE_STR,
-        self::OP_INSERT => self::OP_INSERT_STR,
-        self::OP_REPLACE => self::OP_REPLACE_STR,
+        self::OP_CPY => self::OP_CPY_STR,
+        self::OP_DEL => self::OP_DEL_STR,
+        self::OP_INS => self::OP_INS_STR,
+        self::OP_REP => self::OP_REP_STR,
     ];
 
     // the cost of operations
     const COST_MAP_DEFAULT = [
-        self::OP_COPY => 0,
-        self::OP_DELETE => 1,
-        self::OP_INSERT => 1,
-        self::OP_REPLACE => 1,
+        self::OP_CPY => 0,
+        self::OP_DEL => 1,
+        self::OP_INS => 1,
+        self::OP_REP => 1,
     ];
 
     // progress options
@@ -285,11 +285,11 @@ final class LevenshteinDistance
         for ($x = 1; $x <= $m; ++$x) {
             for ($y = 1; $y <= $n; ++$y) {
                 $dist[$x][$y] = $olds[$x - 1] === $news[$y - 1]
-                    ? $dist[$x - 1][$y - 1] + $this->costMap[self::OP_COPY] // copy
+                    ? $dist[$x - 1][$y - 1] + $this->costMap[self::OP_CPY] // copy
                     : \min(
-                        $dist[$x - 1][$y] + $this->costMap[self::OP_DELETE], // delete
-                        $dist[$x][$y - 1] + $this->costMap[self::OP_INSERT], // insert
-                        $dist[$x - 1][$y - 1] + $this->costMap[self::OP_REPLACE] // replace
+                        $dist[$x - 1][$y] + $this->costMap[self::OP_DEL], // delete
+                        $dist[$x][$y - 1] + $this->costMap[self::OP_INS], // insert
+                        $dist[$x - 1][$y - 1] + $this->costMap[self::OP_REP] // replace
                     );
             }
         }
@@ -361,17 +361,17 @@ final class LevenshteinDistance
             [$x, $y] = $trace
         ) {
             switch ($dist[$x][$y]) {
-                case $dist[$x - 1][$y] + $this->costMap[self::OP_DELETE]:
-                    $trace = [$x - 1, $y, self::OP_DELETE];
+                case $dist[$x - 1][$y] + $this->costMap[self::OP_DEL]:
+                    $trace = [$x - 1, $y, self::OP_DEL];
                     break;
-                case $dist[$x][$y - 1] + $this->costMap[self::OP_INSERT]:
-                    $trace = [$x, $y - 1, self::OP_INSERT];
+                case $dist[$x][$y - 1] + $this->costMap[self::OP_INS]:
+                    $trace = [$x, $y - 1, self::OP_INS];
                     break;
-                case $dist[$x - 1][$y - 1] + $this->costMap[self::OP_REPLACE]:
-                    $trace = [$x - 1, $y - 1, self::OP_REPLACE];
+                case $dist[$x - 1][$y - 1] + $this->costMap[self::OP_REP]:
+                    $trace = [$x - 1, $y - 1, self::OP_REP];
                     break;
                 default:
-                    $trace = [$x - 1, $y - 1, self::OP_COPY];
+                    $trace = [$x - 1, $y - 1, self::OP_CPY];
                     break;
             }
 
@@ -379,11 +379,11 @@ final class LevenshteinDistance
         }
 
         for (; $x > 0; --$x) {
-            $progresses[] = [$x, 0, self::OP_DELETE];
+            $progresses[] = [$x, 0, self::OP_DEL];
         }
 
         for (; $y > 0; --$y) {
-            $progresses[] = [0, $y, self::OP_INSERT];
+            $progresses[] = [0, $y, self::OP_INS];
         }
 
         return $progresses;
@@ -401,17 +401,17 @@ final class LevenshteinDistance
         static $callbacks;
 
         $callbacks = $callbacks ?? [
-            self::OP_COPY => function (int $x, int $y): array {
-                return [self::OP_COPY, $x - 1, $y - 1, 1];
+            self::OP_CPY => function (int $x, int $y): array {
+                return [self::OP_CPY, $x - 1, $y - 1, 1];
             },
-            self::OP_DELETE => function (int $x, int $y): array {
-                return [self::OP_DELETE, $x - 1, $y, 1];
+            self::OP_DEL => function (int $x, int $y): array {
+                return [self::OP_DEL, $x - 1, $y, 1];
             },
-            self::OP_INSERT => function (int $x, int $y): array {
-                return [self::OP_INSERT, $x, $y - 1, 1];
+            self::OP_INS => function (int $x, int $y): array {
+                return [self::OP_INS, $x, $y - 1, 1];
             },
-            self::OP_REPLACE => function (int $x, int $y): array {
-                return [self::OP_REPLACE, $x - 1, $y - 1, 1];
+            self::OP_REP => function (int $x, int $y): array {
+                return [self::OP_REP, $x - 1, $y - 1, 1];
             },
         ];
 
@@ -473,16 +473,10 @@ final class LevenshteinDistance
     protected function makeProgressesPatch(array $olds, array $news, array $progresses): array
     {
         foreach ($progresses as $step => [$operation, $oldPos, $newPos, $length]) {
-            switch ($operation) {
-                default: // default never happens though
-                case self::OP_COPY:
-                case self::OP_DELETE:
-                    $chars = \array_slice($olds, $oldPos, $length);
-                    break;
-                case self::OP_INSERT:
-                case self::OP_REPLACE:
-                    $chars = \array_slice($news, $newPos, $length);
-                    break;
+            if ($operation & (self::OP_CPY | self::OP_DEL)) {
+                $chars = \array_slice($olds, $oldPos, $length);
+            } elseif ($operation & (self::OP_INS | self::OP_REP)) {
+                $chars = \array_slice($news, $newPos, $length);
             }
 
             $progresses[$step][2] = \implode('', $chars);
@@ -501,7 +495,7 @@ final class LevenshteinDistance
     protected function removeCopyProgresses(array $progresses): array
     {
         foreach ($progresses as $step => $progress) {
-            if ($progress[0] === self::OP_COPY) {
+            if ($progress[0] === self::OP_CPY) {
                 unset($progresses[$step]);
             }
         }

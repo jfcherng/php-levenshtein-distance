@@ -130,7 +130,7 @@ class LevenshteinDistanceTest extends TestCase
                 'Heh man!',
                 true,
                 LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_MERGE_NEIGHBOR | LD::PROGRESS_PATCH_MODE,
-                [LD::OP_REPLACE => \INF], // disallow "REPLACE" operation
+                [LD::OP_REP => \INF], // disallow "REPLACE" operation
                 [
                     'distance' => 3,
                     'progresses' => [
