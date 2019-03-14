@@ -4,6 +4,7 @@
 # php-levenshtein-distance 
 
 Calculate the Levenshtein distance and edit progresses between two strings.
+Note that if you do not need the edit path, PHP has a built-in [levenshtein()](http://php.net/manual/en/function.levenshtein.php) function.
 
 
 # Features
