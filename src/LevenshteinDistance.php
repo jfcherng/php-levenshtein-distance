@@ -287,6 +287,7 @@ final class LevenshteinDistance
                 $dist[$x][$y] = $olds[$x - 1] === $news[$y - 1]
                     ? $dist[$x - 1][$y - 1] + $this->costMap[self::OP_CPY] // copy
                     : \min(
+                        /** @phan-suppress-next-line PhanTypeInvalidLeftOperandOfAdd */
                         $dist[$x - 1][$y] + $this->costMap[self::OP_DEL], // delete
                         $dist[$x][$y - 1] + $this->costMap[self::OP_INS], // insert
                         $dist[$x - 1][$y - 1] + $this->costMap[self::OP_REP] // replace
@@ -353,7 +354,7 @@ final class LevenshteinDistance
         $m = \count($dist) - 1;
         $n = \count($dist[0]) - 1;
 
-        $progresses = [];
+        $progresses = $trace = [];
 
         for (
             $x = $m, $y = $n;
