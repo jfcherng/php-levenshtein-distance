@@ -9,8 +9,10 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @coversNothing
+ *
+ * @internal
  */
-class LevenshteinDistanceTest extends TestCase
+final class LevenshteinDistanceTest extends TestCase
 {
     /**
      * Data provider for calculate* function in LevenshteinDistance.
@@ -158,7 +160,7 @@ class LevenshteinDistanceTest extends TestCase
      */
     public function testStaticCalculate(string $old, string $new, bool $calculateProgresses, int $progressOptions, array $expected): void
     {
-        $this->assertSame(
+        static::assertSame(
             $expected,
             LD::staticCalculate($old, $new, $calculateProgresses, $progressOptions)
         );
@@ -178,7 +180,7 @@ class LevenshteinDistanceTest extends TestCase
      */
     public function testCalculate(string $old, string $new, bool $calculateProgresses, int $progressOptions, array $expected): void
     {
-        $this->assertSame(
+        static::assertSame(
             $expected,
             (new LD())
                 ->setCalculateProgresses($calculateProgresses)
@@ -201,7 +203,7 @@ class LevenshteinDistanceTest extends TestCase
      */
     public function testCostMap(string $old, string $new, bool $calculateProgresses, int $progressOptions, array $costMap, array $expected): void
     {
-        $this->assertSame(
+        static::assertSame(
             $expected,
             (new LD())
                 ->setCalculateProgresses($calculateProgresses)
