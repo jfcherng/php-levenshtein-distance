@@ -1,26 +1,31 @@
-[![Build Status](https://travis-ci.org/jfcherng/php-levenshtein-distance.svg?branch=master)](https://travis-ci.org/jfcherng/php-levenshtein-distance)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2e8fc5053c9c47e59b25ba5e56890576)](https://app.codacy.com/app/jfcherng/php-levenshtein-distance?utm_source=github.com&utm_medium=referral&utm_content=jfcherng/php-levenshtein-distance&utm_campaign=Badge_Grade_Settings)
+# php-levenshtein-distance
 
-# php-levenshtein-distance 
+<a href="https://travis-ci.org/jfcherng/php-levenshtein-distance"><img alt="Travis (.org) branch" src="https://img.shields.io/travis/jfcherng/php-levenshtein-distance/master"></a>
+<a href="https://app.codacy.com/project/jfcherng/php-levenshtein-distance/dashboard"><img alt="Codacy grade" src="https://img.shields.io/codacy/grade/2e8fc5053c9c47e59b25ba5e56890576/master"></a>
+<a href="https://packagist.org/packages/jfcherng/php-levenshtein-distance"><img alt="Packagist" src="https://img.shields.io/packagist/dt/jfcherng/php-levenshtein-distance"></a>
+<a href="https://packagist.org/packages/jfcherng/php-levenshtein-distance"><img alt="Packagist Version" src="https://img.shields.io/packagist/v/jfcherng/php-levenshtein-distance"></a>
+<a href="https://github.com/jfcherng/php-levenshtein-distance/blob/master/LICENSE"><img alt="Project license" src="https://img.shields.io/github/license/jfcherng/php-levenshtein-distance"></a>
+<a href="https://github.com/jfcherng/php-levenshtein-distance/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/jfcherng/php-levenshtein-distance?logo=github"></a>
+<a href="https://www.paypal.me/jfcherng/5usd" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-blue.svg?logo=paypal" /></a>
 
 Calculate the Levenshtein distance and edit progresses between two strings.
 Note that if you do not need the edit path, PHP has a built-in [levenshtein()](http://php.net/manual/en/function.levenshtein.php) function.
 
 
-# Features
+## Features
 
 - UTF-8-ready.
 - Full edit progresses information.
 
 
-# Installation
+## Installation
 
-```
+```bash
 $ composer require jfcherng/php-levenshtein-distance
 ```
 
 
-# Example
+## Example
 
 See `demo.php`.
 
@@ -91,7 +96,7 @@ var_dump($results);
 ```
 
 
-# Progress Options
+## Progress Options
 
 - `LD::PROGRESS_NO_COPY`: Do not include `COPY` operations in the progresses.
 - `LD::PROGRESS_MERGE_NEIGHBOR`: Merge neighbor progresses if possible.
@@ -99,16 +104,10 @@ var_dump($results);
 - `LD::PROGRESS_PATCH_MODE`: Replace the new edit position with the corresponding string.
 
 
-# Return value
+## Returned `progresses`
 
 1. The operation.
 1. The edit position for the new string.
 1. The edit position for the old string.
    Or the corresponding string if `LD::PROGRESS_PATCH_MODE` is used.
 1. The edit length.
-
-
-Supporters <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ATXYY9Y78EQ3Y" target="_blank"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" /></a>
-==========
-
-Thank you guys for sending me some cups of coffee.
