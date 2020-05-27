@@ -3,6 +3,20 @@ VERSION 2  INIT
 ===============
 
    Version 2.3 - init
+      28/05/2020 03:42  4.0.1  allow PHP 8
+         2299058 chore: make phan happy
+         7c2f2e8 style: composer run-script fix
+         4ba1e92 chore: update deps
+         f5bf3bd chore: Composer PHP constrain >=7.1.3
+         7865869 Update readme to use badges from shields.io
+         79250fb Add .gitattributes
+         c6a82bd $ composer fix
+         450b187 Update deps
+         7184e62 Update .travis.yml for 7.4snapshot
+         3523ce5 Add .editorconfig
+         a920985 Update readme
+         edb3403 Fix phan error
+         3c735a6 Update deps
       04/09/2018 18:58  2.3.5  php-cs-fixer
          bc38e07 php-cs-fixer: enable native_constant_invocation and native_function_invocation
          36c4489 Update deps
