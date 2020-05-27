@@ -239,7 +239,10 @@ final class LevenshteinDistance
      * $dist[x][y] means the Levenshtein distance betweewn $olds[0:x] and $news[0:y].
      * That is, $dist[oldsCount][oldsCount] is what we are interested in.
      *
+     * @phan-suppress PhanTypeArraySuspiciousNull
      * @phan-suppress PhanTypeInvalidDimOffset
+     * @phan-suppress PhanTypeInvalidLeftOperandOfAdd
+     * @phan-suppress PhanTypePossiblyInvalidDimOffset
      *
      * @param array $olds the olds
      * @param array $news the news
@@ -273,7 +276,6 @@ final class LevenshteinDistance
                 $dist[$x][$y] = $olds[$x - 1] === $news[$y - 1]
                     ? $dist[$x - 1][$y - 1] + $this->costMap[self::OP_CPY] // copy
                     : \min(
-                        /** @phan-suppress-next-line PhanTypeInvalidLeftOperandOfAdd */
                         $dist[$x - 1][$y] + $this->costMap[self::OP_DEL], // delete
                         $dist[$x][$y - 1] + $this->costMap[self::OP_INS], // insert
                         $dist[$x - 1][$y - 1] + $this->costMap[self::OP_REP] // replace
