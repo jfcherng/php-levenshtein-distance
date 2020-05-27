@@ -94,8 +94,6 @@ final class LevenshteinDistance
      * Set the calculate progresses.
      *
      * @param bool $calculateProgresses calculate the edit progresses
-     *
-     * @return self
      */
     public function setCalculateProgresses(bool $calculateProgresses): self
     {
@@ -108,8 +106,6 @@ final class LevenshteinDistance
      * Set the progress options.
      *
      * @param int $progressOptions the progress options
-     *
-     * @return self
      */
     public function setProgressOptions(int $progressOptions): self
     {
@@ -122,8 +118,6 @@ final class LevenshteinDistance
      * Set the cost map.
      *
      * @param int[] $costMap the cost map
-     *
-     * @return self
      */
     public function setCostMap(array $costMap): self
     {
@@ -136,8 +130,6 @@ final class LevenshteinDistance
      * Set the maximum size.
      *
      * @param float $size the size
-     *
-     * @return self
      */
     public function setMaxSize(float $size): self
     {
@@ -148,8 +140,6 @@ final class LevenshteinDistance
 
     /**
      * Get the calculate progresses.
-     *
-     * @return bool
      */
     public function getCalculateProgresses(): bool
     {
@@ -158,8 +148,6 @@ final class LevenshteinDistance
 
     /**
      * Get the progress options.
-     *
-     * @return int
      */
     public function getProgressOptions(): int
     {
@@ -188,8 +176,6 @@ final class LevenshteinDistance
 
     /**
      * Get the singleton.
-     *
-     * @return self
      */
     public static function getInstance(): self
     {
@@ -431,8 +417,6 @@ final class LevenshteinDistance
      * Merge neighbor progresses and return the merged result.
      *
      * @param array $progresses the progresses
-     *
-     * @return array
      */
     private function mergeNeighborProgresses(array $progresses): array
     {
@@ -468,8 +452,6 @@ final class LevenshteinDistance
      * @param array $olds       the old characters
      * @param array $news       the new characters
      * @param array $progresses the progresses
-     *
-     * @return array
      */
     private function makeProgressesPatch(array $olds, array $news, array $progresses): array
     {
@@ -492,8 +474,6 @@ final class LevenshteinDistance
      * Remove "COPY" progresses.
      *
      * @param array $progresses the progresses
-     *
-     * @return array
      */
     private function removeCopyProgresses(array $progresses): array
     {
@@ -511,8 +491,6 @@ final class LevenshteinDistance
      * Convert the operation in progresses from int to string.
      *
      * @param array $progresses the progresses
-     *
-     * @return array
      */
     private function stringifyOperations(array $progresses): array
     {
