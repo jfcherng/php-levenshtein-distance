@@ -1,12 +1,11 @@
 # php-levenshtein-distance
 
-<a href="https://travis-ci.org/jfcherng/php-levenshtein-distance"><img alt="Travis (.org) branch" src="https://img.shields.io/travis/jfcherng/php-levenshtein-distance/master"></a>
-<a href="https://app.codacy.com/project/jfcherng/php-levenshtein-distance/dashboard"><img alt="Codacy grade" src="https://img.shields.io/codacy/grade/2e8fc5053c9c47e59b25ba5e56890576/master"></a>
-<a href="https://packagist.org/packages/jfcherng/php-levenshtein-distance"><img alt="Packagist" src="https://img.shields.io/packagist/dt/jfcherng/php-levenshtein-distance"></a>
-<a href="https://packagist.org/packages/jfcherng/php-levenshtein-distance"><img alt="Packagist Version" src="https://img.shields.io/packagist/v/jfcherng/php-levenshtein-distance"></a>
-<a href="https://github.com/jfcherng/php-levenshtein-distance/blob/master/LICENSE"><img alt="Project license" src="https://img.shields.io/github/license/jfcherng/php-levenshtein-distance"></a>
-<a href="https://github.com/jfcherng/php-levenshtein-distance/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/jfcherng/php-levenshtein-distance?logo=github"></a>
-<a href="https://www.paypal.me/jfcherng/5usd" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-blue.svg?logo=paypal" /></a>
+[![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/jfcherng/php-levenshtein-distance/Main/master?style=flat-square)](https://github.com/jfcherng/php-levenshtein-distance/actions)
+[![Packagist](https://img.shields.io/packagist/dt/jfcherng/php-levenshtein-distance?style=flat-square)](https://packagist.org/packages/jfcherng/php-levenshtein-distance)
+[![Packagist Version](https://img.shields.io/packagist/v/jfcherng/php-levenshtein-distance?style=flat-square)](https://packagist.org/packages/jfcherng/php-levenshtein-distance)
+[![Project license](https://img.shields.io/github/license/jfcherng/php-levenshtein-distance?style=flat-square)](https://github.com/jfcherng/php-levenshtein-distance/blob/master/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/jfcherng/php-levenshtein-distance?style=flat-square&logo=github)](https://github.com/jfcherng/php-levenshtein-distance/stargazers)
+[![Donate to this project using Paypal](https://img.shields.io/badge/paypal-donate-blue.svg?style=flat-square&logo=paypal)](https://www.paypal.me/jfcherng/5usd)
 
 Calculate the Levenshtein distance and edit progresses between two strings.
 Note that if you do not need the edit path, PHP has a built-in [levenshtein()](http://php.net/manual/en/function.levenshtein.php) function.
