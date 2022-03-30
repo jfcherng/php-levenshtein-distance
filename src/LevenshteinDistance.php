@@ -15,19 +15,19 @@ namespace Jfcherng\Diff;
 final class LevenshteinDistance
 {
     // operations enum
-    const OP_CPY = 1 << 0;
-    const OP_DEL = 1 << 1;
-    const OP_INS = 1 << 2;
-    const OP_REP = 1 << 3;
+    public const OP_CPY = 1 << 0;
+    public const OP_DEL = 1 << 1;
+    public const OP_INS = 1 << 2;
+    public const OP_REP = 1 << 3;
 
     // operations enum
-    const OP_CPY_STR = 'cpy';
-    const OP_DEL_STR = 'del';
-    const OP_INS_STR = 'ins';
-    const OP_REP_STR = 'rep';
+    public const OP_CPY_STR = 'cpy';
+    public const OP_DEL_STR = 'del';
+    public const OP_INS_STR = 'ins';
+    public const OP_REP_STR = 'rep';
 
     // operations enum
-    const OP_INT2STR_MAP = [
+    public const OP_INT2STR_MAP = [
         self::OP_CPY => self::OP_CPY_STR,
         self::OP_DEL => self::OP_DEL_STR,
         self::OP_INS => self::OP_INS_STR,
@@ -35,7 +35,7 @@ final class LevenshteinDistance
     ];
 
     // the cost of operations
-    const COST_MAP_DEFAULT = [
+    public const COST_MAP_DEFAULT = [
         self::OP_CPY => 0,
         self::OP_DEL => 1,
         self::OP_INS => 1,
@@ -43,10 +43,10 @@ final class LevenshteinDistance
     ];
 
     // progress options
-    const PROGRESS_NO_COPY = 1 << 0;
-    const PROGRESS_MERGE_NEIGHBOR = 1 << 1;
-    const PROGRESS_OP_AS_STRING = 1 << 2;
-    const PROGRESS_PATCH_MODE = 1 << 3;
+    public const PROGRESS_NO_COPY = 1 << 0;
+    public const PROGRESS_MERGE_NEIGHBOR = 1 << 1;
+    public const PROGRESS_OP_AS_STRING = 1 << 2;
+    public const PROGRESS_PATCH_MODE = 1 << 3;
 
     /**
      * Calculate the edit progresses.
@@ -87,7 +87,8 @@ final class LevenshteinDistance
         $this
             ->setCalculateProgresses($calculateProgresses)
             ->setProgressOptions($progressOptions)
-            ->setMaxSize($maxSize);
+            ->setMaxSize($maxSize)
+        ;
     }
 
     /**
@@ -181,11 +182,7 @@ final class LevenshteinDistance
     {
         static $singleton;
 
-        if (!isset($singleton)) {
-            $singleton = new static();
-        }
-
-        return $singleton;
+        return $singleton ??= new static();
     }
 
     /**
@@ -203,7 +200,8 @@ final class LevenshteinDistance
         return static::getInstance()
             ->setCalculateProgresses($calculateProgresses)
             ->setProgressOptions($progressOptions)
-            ->calculate($old, $new);
+            ->calculate($old, $new)
+        ;
     }
 
     /**
@@ -216,8 +214,8 @@ final class LevenshteinDistance
      */
     public function calculate(string $old, string $new): array
     {
-        $olds = \preg_split('//uS', $old, -1, \PREG_SPLIT_NO_EMPTY);
-        $news = \preg_split('//uS', $new, -1, \PREG_SPLIT_NO_EMPTY);
+        $olds = preg_split('//uS', $old, -1, \PREG_SPLIT_NO_EMPTY);
+        $news = preg_split('//uS', $new, -1, \PREG_SPLIT_NO_EMPTY);
 
         // calculate edit distance matrix
         $dist = $this->calculateDistance($olds, $news);
@@ -275,10 +273,10 @@ final class LevenshteinDistance
             for ($y = 1; $y <= $n; ++$y) {
                 $dist[$x][$y] = $olds[$x - 1] === $news[$y - 1]
                     ? $dist[$x - 1][$y - 1] + $this->costMap[self::OP_CPY] // copy
-                    : \min(
+                    : min(
                         $dist[$x - 1][$y] + $this->costMap[self::OP_DEL], // delete
                         $dist[$x][$y - 1] + $this->costMap[self::OP_INS], // insert
-                        $dist[$x - 1][$y - 1] + $this->costMap[self::OP_REP] // replace
+                        $dist[$x - 1][$y - 1] + $this->costMap[self::OP_REP], // replace
                     );
             }
         }
@@ -389,25 +387,17 @@ final class LevenshteinDistance
     {
         static $callbacks;
 
-        $callbacks = $callbacks ?? [
-            self::OP_CPY => function (int $x, int $y): array {
-                return [self::OP_CPY, $x - 1, $y - 1, 1];
-            },
-            self::OP_DEL => function (int $x, int $y): array {
-                return [self::OP_DEL, $x - 1, $y, 1];
-            },
-            self::OP_INS => function (int $x, int $y): array {
-                return [self::OP_INS, $x, $y - 1, 1];
-            },
-            self::OP_REP => function (int $x, int $y): array {
-                return [self::OP_REP, $x - 1, $y - 1, 1];
-            },
+        $callbacks ??= [
+            self::OP_CPY => fn (int $x, int $y): array => [self::OP_CPY, $x - 1, $y - 1, 1],
+            self::OP_DEL => fn (int $x, int $y): array => [self::OP_DEL, $x - 1, $y, 1],
+            self::OP_INS => fn (int $x, int $y): array => [self::OP_INS, $x, $y - 1, 1],
+            self::OP_REP => fn (int $x, int $y): array => [self::OP_REP, $x - 1, $y - 1, 1],
         ];
 
         foreach ($rawProgresses as &$rawProgress) {
             $rawProgress = $callbacks[$rawProgress[2]](
                 $rawProgress[0],
-                $rawProgress[1]
+                $rawProgress[1],
             );
         }
         unset($rawProgress);
@@ -466,7 +456,7 @@ final class LevenshteinDistance
                 $chars = [];
             }
 
-            $progresses[$step][2] = \implode('', $chars);
+            $progresses[$step][2] = implode('', $chars);
         }
 
         return $progresses;
@@ -486,7 +476,7 @@ final class LevenshteinDistance
         }
 
         // resort keys
-        return \array_values($progresses);
+        return array_values($progresses);
     }
 
     /**

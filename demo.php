@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 include __DIR__ . '/vendor/autoload.php';
 
 use Jfcherng\Utility\LevenshteinDistance as LD;
@@ -10,7 +12,7 @@ $new = '自订取代词语模组！';
 $calculator = new LD(
     true, // calculate edit progresses?
     // progress options
-    LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_PATCH_MODE
+    LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_PATCH_MODE,
 );
 
 $results = $calculator->calculate($old, $new);
@@ -21,7 +23,7 @@ $results = LD::staticCalculate(
     $new, // new string
     true, // calculate edit progresses?
     // progress options
-    LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_PATCH_MODE
+    LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_PATCH_MODE,
 );
 
 // [
@@ -38,14 +40,14 @@ $results = LD::staticCalculate(
 //         ['cpy', 0, '自', 1],
 //     ],
 // ]
-\var_dump($results);
+var_dump($results);
 
 $results = LD::staticCalculate(
     $old, // old string
     $new, // new string
     true, // calculate edit progresses?
     // progress options
-    LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_PATCH_MODE | LD::PROGRESS_MERGE_NEIGHBOR
+    LD::PROGRESS_OP_AS_STRING | LD::PROGRESS_PATCH_MODE | LD::PROGRESS_MERGE_NEIGHBOR,
 );
 
 // [
@@ -60,4 +62,4 @@ $results = LD::staticCalculate(
 //         ['cpy', 0, '自', 1],
 //     ],
 // ]
-\var_dump($results);
+var_dump($results);

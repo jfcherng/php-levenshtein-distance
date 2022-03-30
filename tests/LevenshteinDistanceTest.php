@@ -162,7 +162,7 @@ final class LevenshteinDistanceTest extends TestCase
     {
         static::assertSame(
             $expected,
-            LD::staticCalculate($old, $new, $calculateProgresses, $progressOptions)
+            LD::staticCalculate($old, $new, $calculateProgresses, $progressOptions),
         );
     }
 
@@ -185,7 +185,7 @@ final class LevenshteinDistanceTest extends TestCase
             (new LD())
                 ->setCalculateProgresses($calculateProgresses)
                 ->setProgressOptions($progressOptions)
-                ->calculate($old, $new)
+                ->calculate($old, $new),
         );
     }
 
@@ -209,7 +209,7 @@ final class LevenshteinDistanceTest extends TestCase
                 ->setCalculateProgresses($calculateProgresses)
                 ->setProgressOptions($progressOptions)
                 ->setCostMap($costMap)
-                ->calculate($old, $new)
+                ->calculate($old, $new),
         );
     }
 }
