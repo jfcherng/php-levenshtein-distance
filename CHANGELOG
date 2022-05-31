@@ -3,6 +3,23 @@ VERSION 2  INIT
 ===============
 
    Version 2.3 - init
+      31/05/2022 21:28  4.0.2  fix demo
+         849f558 chore: update deps
+         0119d3c fix: wrong namespace in demo.php
+         3208dd5 docs: fix wrong namespace
+         d0e2828 style: reformat files
+         01bd492 chore: update php-cs-fixer rules
+         3fcbe95 chore: min PHP version is 7.4
+         26177eb chore(ci): test against PHP 8.1
+         0e1843a chore: update deps
+         f8b7879 chore: add RMT executable
+         b3d291a chore: license year +1
+         0b5b159 chore(ci): test against PHP 8.0
+         ac4110b chore: update deps
+         ac0307b chore: update deps
+         7dc1b9d chore: Composer 2 no longer neeeds hirak/prestissimo
+         30b630f chore(ci): migrate CI from Travis to GitHub Actions
+         e045e1e chore: update license year
       28/05/2020 03:42  4.0.1  allow PHP 8
          2299058 chore: make phan happy
          7c2f2e8 style: composer run-script fix
