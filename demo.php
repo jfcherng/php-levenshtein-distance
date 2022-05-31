@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 include __DIR__ . '/vendor/autoload.php';
 
-use Jfcherng\Utility\LevenshteinDistance as LD;
+use Jfcherng\Diff\LevenshteinDistance as LD;
 
 $old = '自訂取代詞語模組';
 $new = '自订取代词语模组！';
