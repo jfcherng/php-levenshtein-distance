@@ -1,6 +1,6 @@
 # php-levenshtein-distance
 
-[![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/jfcherng/php-levenshtein-distance/Main/master?style=flat-square)](https://github.com/jfcherng/php-levenshtein-distance/actions)
+[![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/jfcherng/php-levenshtein-distance/php.yml?branch=master&style=flat-square)](https://github.com/jfcherng/php-levenshtein-distance/actions)
 [![Packagist](https://img.shields.io/packagist/dt/jfcherng/php-levenshtein-distance?style=flat-square)](https://packagist.org/packages/jfcherng/php-levenshtein-distance)
 [![Packagist Version](https://img.shields.io/packagist/v/jfcherng/php-levenshtein-distance?style=flat-square)](https://packagist.org/packages/jfcherng/php-levenshtein-distance)
 [![Project license](https://img.shields.io/github/license/jfcherng/php-levenshtein-distance?style=flat-square)](https://github.com/jfcherng/php-levenshtein-distance/blob/master/LICENSE)
